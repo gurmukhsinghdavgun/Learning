@@ -1,3 +1,5 @@
+#Factorial number
+
 i = 0
 num = 4
 new_array = []
