@@ -1,0 +1,10 @@
+i = 0
+num = 4
+new_array = []
+
+while i < num do
+  i += 1
+  new_array << i
+end
+
+print new_array.inject(:*)
