@@ -1,0 +1,16 @@
+arr = [1,1,1,2]
+
+until arr.size == 1
+
+  dup_arr = []
+  new_array = []
+
+  arr.each do |i|
+    dup_arr << i
+  end
+
+  dup_arr.slice!(0)
+  arr.pop
+  print arr.zip(dup_arr).map{|x,y| x - y}
+
+end
