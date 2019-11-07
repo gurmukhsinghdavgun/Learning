@@ -1,0 +1,58 @@
+require 'csv'
+
+allAccounts = {}
+CSV.foreach('accounts.csv') do |key, value|
+  allAccounts[key] = value
+end
+
+puts 'What would you like to do?'
+puts 'Enter 1 to check balance'
+puts 'Enter 2 to withdraw funds'
+puts 'Enter 3 to Make an account'
+responce = gets.chomp.to_i
+
+if responce == 1
+  puts 'Enter your account number'
+  accountNumber = gets.chomp
+
+  if allAccounts.has_key?(accountNumber)
+    s = allAccounts.fetch(accountNumber)
+    puts "Your account balance is £#{s}"
+  else
+    puts 'your account doesnot exits'
+  end
+elsif responce == 2
+  puts 'Enter your account number'
+  accountNumber = gets.chomp
+
+  if allAccounts.has_key?(accountNumber)
+    s = allAccounts.fetch(accountNumber).to_i
+    puts "Your account balance is £#{s}"
+    puts "how much would you like to withdraw"
+    withdrawAmount = gets.chomp.to_i
+    while withdrawAmount > s
+      puts "you cant withdraw more than £#{s}"
+      puts "how much would you like to withdraw"
+      withdrawAmount = gets.chomp.to_i
+    end
+    newAmmount = s - withdrawAmount
+    allAccounts[accountNumber] = newAmmount
+    CSV.open('accounts.csv', "wb"){|csv| allAccounts.to_a.each {|elem| csv << elem} }
+    balance = allAccounts.fetch(accountNumber)
+    puts "Your new account balance is £#{balance}"
+  else
+    puts 'your account doesnot exits'
+  end
+elsif responce == 3
+  accountNumber = rand(1..999)
+  puts 'you need to add funds to open an account'
+  puts 'how much would you like to add'
+  funds = gets.chomp.to_i
+  puts "Here is you account number #{accountNumber}"
+  allAccounts[accountNumber] = funds
+  puts 'enter your account number to verify your account'
+  verifyaccount = gets.chomp.to_i
+  s = allAccounts.fetch(verifyaccount)
+  puts "your account number is #{verifyaccount} and your funds are #{s}"
+  CSV.open('accounts.csv', "wb"){|csv| allAccounts.to_a.each {|elem| csv << elem} }
+end
