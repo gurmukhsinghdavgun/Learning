@@ -1,0 +1,62 @@
+numbers_to_name = {
+  1000000 => "million", 1000 => "thousand", 100 => "hundred", 90 => "ninety",
+  80 => "eighty", 70 => "seventy", 60 => "sixty", 50 => "fifty", 40 => "forty",
+  30 => "thirty", 20 => "twenty", 19=>"nineteen", 18=>"eighteen", 17=>"seventeen",
+  16=>"sixteen", 15=>"fifteen", 14=>"fourteen", 13=>"thirteen", 12=>"twelve",
+  11 => "eleven", 10 => "ten", 9 => "nine", 8 => "eight", 7 => "seven",   6 => "six",
+  5 => "five", 4 => "four", 3 => "three", 2 => "two", 1 => "one", 0 => ""
+}
+
+(1..1000000).each do |n|
+  if numbers_to_name.has_key?(n)
+    puts numbers_to_name.fetch(n)
+  else
+    arr = n.to_s.split("")
+    if arr.length == 2
+      first_elem = arr[0].to_s << "0"
+      puts "#{numbers_to_name.fetch(first_elem.to_i)} #{numbers_to_name.fetch(arr[1].to_i)}"
+    elsif arr.length == 3
+      if arr[1].to_i.between?(2,9) && arr[2].to_i.between?(1,9)
+        middle_ten = arr[1].to_s << "0"
+        puts "#{numbers_to_name.fetch(arr[0].to_i)} hundred and #{numbers_to_name.fetch(middle_ten.to_i)} #{numbers_to_name.fetch(arr[2].to_i)} -> #{arr}"
+      elsif arr[1].to_i == 1
+        tens = arr[1].to_s << arr[2].to_s
+        puts "#{numbers_to_name.fetch(arr[0].to_i)} hundred and #{numbers_to_name.fetch(tens.to_i)} -> #{arr}"
+      elsif arr[1].to_i.between?(1,9) && arr[2].to_i == 0
+        middle_full = arr[1].to_s << "0"
+        puts "#{numbers_to_name.fetch(arr[0].to_i)} hundred and #{numbers_to_name.fetch(middle_full.to_i)} -> #{arr}"
+      end
+    elsif arr.length == 4
+      if arr[1].to_i.between?(1,9) && arr[2].to_i.between?(1,9) && arr[3].to_i != 0
+        tenth = arr[2].to_s << "0"
+        puts "#{numbers_to_name.fetch(arr[0].to_i)} thousand #{numbers_to_name.fetch(arr[1].to_i)} hundred and #{numbers_to_name.fetch(tenth.to_i)} #{numbers_to_name.fetch(arr[3].to_i)}"
+      end
+      if arr[2].to_i.between?(1,9) && arr[3].to_i != 0
+        tenth = arr[2].to_s << "0"
+        puts "#{numbers_to_name.fetch(arr[0].to_i)} thousand and #{numbers_to_name.fetch(tenth.to_i)} #{numbers_to_name.fetch(arr[3].to_i)} #{arr}"
+      end
+    elsif arr.length == 5
+      if arr[1].to_i.between?(1,9)
+        ten_thousand = arr[0].to_s << arr[1].to_s
+        tenth = arr[3].to_s << "0"
+        if arr[0].to_i >= 20
+          arr_elem_one_split = arr[0].to_s.split("")
+          big_thousand = arr_elem_one_split[0].to_s << "0"
+          puts "#{numbers_to_name.fetch(big_thousand.to_i)} #{numbers_to_name.fetch(arr_elem_one_split[1].to_i)} thousand #{numbers_to_name.fetch(arr[2].to_i)} hundred and #{numbers_to_name.fetch(tenth.to_i)} #{numbers_to_name.fetch(arr[4].to_i)} "
+        else
+          puts "#{numbers_to_name.fetch(ten_thousand.to_i)} thousand #{numbers_to_name.fetch(arr[2].to_i)} hundred and #{numbers_to_name.fetch(tenth.to_i)} #{numbers_to_name.fetch(arr[4].to_i)} "
+        end
+      end
+    else arr.length == 6
+      ten_thousand = arr[1].to_s << arr[2].to_s
+      tens = arr[4].to_s << "0"
+      if arr[1].to_i >= 20
+        arr_elem_one_split = arr[0].to_s.split("")
+        big_thousand = arr_elem_one_split[0].to_s << "0"
+        puts "#{numbers_to_name.fetch(arr[0].to_i)} hundred and #{numbers_to_name.fetch(big_thousand.to_i)} #{arr_elem_one_split[1].to_i} thousand #{numbers_to_name.fetch(arr[3].to_i)} hundred and #{numbers_to_name.fetch(tens.to_i)} #{numbers_to_name.fetch(arr[5].to_i)}"
+      else
+        puts "#{numbers_to_name.fetch(arr[0].to_i)} hundred and #{numbers_to_name.fetch(ten_thousand.to_i)} thousand #{numbers_to_name.fetch(arr[3].to_i)} hundred and #{numbers_to_name.fetch(tens.to_i)} #{numbers_to_name.fetch(arr[5].to_i)}"
+      end
+    end
+  end
+end
