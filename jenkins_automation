@@ -1,0 +1,69 @@
+using Atlassian.Jira;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Net.Http;
+
+
+namespace QueAuto
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Jira Credentials username,password");
+            string jira_credentials = Console.ReadLine().ToString();
+            Console.WriteLine("Jira id - seperate with , for multiple");
+            string jiras = Console.ReadLine();
+           
+            // create a connection to JIRA using the Rest client
+            var jira = Jira.CreateRestClient("https://jira", jira_credentials.Split(',')[0].ToString(), jira_credentials.Split(',')[1].ToString());
+
+            var jirasToDo = jiras.Split(',');
+           
+            var issues = from i in jira.Issues.Queryable
+                         where i.Key == "PRJAPPV-584" //PRJAPPV-584 SUPBAC-11152 PRJFPG-602
+                         select i;
+            
+            string NEWJENKINS = "git";
+
+            HttpClient client = new HttpClient();
+
+            foreach (var i in issues)
+            {
+                Console.WriteLine("Jira ID = " + i.Key + "-" + i["Git Project URL"]);
+                string gitRevision = i["Git Tag"].ToString();
+                string DeployServer = i["Target Server (s)"].ToString().Replace(System.Environment.NewLine, ",");
+                string JiraID = i.Key.ToString();
+                string JenkinsType = i["Git Project URL"].ToString();
+               
+                var values = new Dictionary<string, string>
+                {
+                    { "gitRevision", gitRevision },
+                    { "DeployServer", DeployServer },
+                    { "JiraID", JiraID}
+                };
+
+                //var content = new FormUrlEncodedContent(values);
+
+                //if (JenkinsType.Contains(NEWJENKINS))
+                //{
+                //    string JenkinsJob = (i["Git Product"]).ToString().Replace(" ", string.Empty);
+
+                //    string[] f_path = i.CustomFields["Git Product"].Values.Last().ToString().Replace(" ", string.Empty).Split('-');
+                    
+                //    string build_url = "https://gurmukhdavgun:testkeyhere7ae9aec36c@" + "jenkins-cd/job/" + JenkinsJob + "/view/" + f_path[0] + "/job/" + f_path[1] + "/buildWithParameters?";
+
+                //    var response = client.PostAsync(build_url, content);
+                    
+                //}
+            }
+
+            Console.ReadLine();
+        }
+        
+    }
+}
