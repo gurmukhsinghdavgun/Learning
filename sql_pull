@@ -1,0 +1,70 @@
+require 'nokogiri'
+require 'open-uri'
+require 'json'
+
+full_mysql_import = []
+
+url_input = ARGV
+
+puts url_input.to_s
+
+url_input.each do |a|
+  sqltable = Hash.new{|hsh,key| hsh[key] = []}
+  columns_arrays = []
+  data_values = []
+
+  html_data = open("#{a}").read
+  nokogiri_object = Nokogiri::HTML(html_data)
+  sql_structure = nokogiri_object.xpath('//pre/text()')
+
+  split_sql = sql_structure.to_s.split(',').map(&:strip)
+
+  split_sql.each do |a|
+    columns_arrays << a
+  end
+
+  first_row = columns_arrays[0]
+  first_column = first_row.split("(")[1]
+  first_column.lstrip!
+
+  draft_table_name = columns_arrays[0]
+  table_name = draft_table_name.split("(")[0].downcase
+  table_name.slice! "create table "
+  table_name.strip!
+
+  columns_arrays.clear
+
+  split_sql.push(first_column)
+  split_sql.rotate(1)
+
+  split_sql.drop(1).each do |a|
+    if a.match(/\bint\b/)
+      data_values << "123"
+    elsif a.match(/\btinyint\b/)
+      data_values << "1"
+    elsif a.match(/\bsmallint\b/)
+      data_values << "12"
+    elsif a.match(/\btime\b/) || a.match(/\btimestamp\b/)
+      data_values << "09:14:06"
+    elsif a.match(/\bvarchar\b/)
+      data_values << "abc"
+    elsif a.match(/\btext\b/)
+      data_values << "PUT YOUR TEXT IN HERE"
+    elsif a.match(/\bdatetime\b/)
+      data_values << "04 Nov 2014 11:45:34"
+    elsif a.match(/\bdate\b/)
+      data_values << "2016-10-10"  
+    end
+    a.gsub!(/\s.+/, '')
+    columns_arrays << a
+  end
+
+  columns_arrays_mod = columns_arrays - %w{PRIMARY INDEX}
+
+  sqltable[table_name].push(columns_arrays_mod)
+  sqltable[table_name].push(data_values)
+  full_mysql_import.push(sqltable)
+end
+File.open("MySQLImport.json","w") do |f|
+  f.write(JSON.pretty_generate(full_mysql_import))
+end
